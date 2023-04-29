@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-frontend-gke
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gcp
+  template:
+    metadata:
+      labels:
+        app: gcp
+    spec:
+      containers:
+      - name: website-frontend-gke
+        image: gcr.io/sit-23t1-cicd-pipeline-b7292e5/website-frontend:latest
+        ports:
+        - containerPort: 3000
+        env:
+          - name: PORT
+            value: "3000"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "gcp-website-frontend-gke-service"
+  namespace: "website-frontend-test"
+  labels:
+    app.kubernetes.io/managed-by: "gcp-cloud-build-deploy"
+spec:
+  ports:
+  - protocol: "TCP"
+    port: 80
+    targetPort: 3000
+  selector:
+    app: "gcp"
+  type: "LoadBalancer"
